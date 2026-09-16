@@ -1,38 +1,39 @@
-name: Deploy MifTech portfolio concurrency: 
+name: Deploy MifTech portfolio
+
 on:
-push:
-  branches: ["main"]
+  push:
+    branches: ["main"]
   workflow_dispatch:
-  permission:
-   contents: read
-   pages: write
-   id-token: write
 
-   concurrency:
-    group: "pagrs"
-    cancel-in-progress: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-    jobs:
-      deploy:
-      environment:
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
       name: github-pages
-      url: $
-      {{ steps.deployment.outputs.page_url }}
-          
-      runs-on: ubuntu-last
+      url: ${{ steps.deployment.outputs.page_url }}
 
-      steps:
-        name: checkout
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
         uses: actions/checkout@v4
 
-        name: setup pages
-        uses: action/configure-pages@v5
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-        name: upload frontend
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-         path: "./frontend"
+          path: .
 
-         name: Deploy to GitHub pages 
-         id: deployment
-         uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
